@@ -90,8 +90,8 @@ docker compose up --build
 | Service | URL |
 |---------|-----|
 | 🖥️ Landing + Dashboard | http://localhost:3000 |
-| ⚙️ API (FastAPI) | http://localhost:8000 |
-| 📚 Docs interactives | http://localhost:8000/docs |
+| ⚙️ API (FastAPI) | http://localhost:8001 |
+| 📚 Docs interactives | http://localhost:8001/docs |
 
 ### En local (backend seul)
 
@@ -126,7 +126,7 @@ Toutes les routes sont préfixées par `/api/v1`. Si `API_KEY` est défini, ajou
 Exemple :
 
 ```bash
-curl -X POST http://localhost:8000/api/v1/act \
+curl -X POST http://localhost:8001/api/v1/act \
   -H "Content-Type: application/json" \
   -d '{"dry_run": true}'
 ```

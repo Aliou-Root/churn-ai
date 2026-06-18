@@ -177,7 +177,7 @@
 
 <script>
 const $ = id => document.getElementById(id);
-const API = 'http://localhost:8000/api/v1';
+const API = location.protocol === 'http:' || location.protocol === 'https:' ? '/api/v1' : 'http://localhost:8001/api/v1';
 const STAGES = ['data','analysis','predict','decision','action','roi'];
 const badgeCls = { critical:'bc', high:'bh', medium:'bm', low:'bl' };
 const AICO = { email:'📧', discount:'🎁', call:'📞', upgrade_offer:'⬆️', notification:'🔔', no_action:'✓', flag_for_review:'🚩' };
