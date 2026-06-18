@@ -3,327 +3,392 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>ChurnAI — Prévention autonome du churn SaaS par agents IA</title>
-<meta name="description" content="ChurnAI détecte, prédit et prévient le churn de vos clients SaaS automatiquement grâce à un système multi-agents propulsé par Claude. Du signal à l'action de rétention, sans intervention humaine."/>
-<meta property="og:title" content="ChurnAI — Prévention autonome du churn SaaS"/>
-<meta property="og:description" content="Système multi-agents IA qui transforme vos données produit et Stripe en actions de rétention personnalisées."/>
-<meta property="og:type" content="website"/>
+<title>ChurnAI — Intelligence de rétention SaaS, par agents</title>
+<meta name="description" content="ChurnAI lit les signaux faibles de vos clients SaaS, prédit qui s'apprête à partir et déclenche la bonne action de rétention. Un système multi-agents propulsé par Claude."/>
+<meta property="og:title" content="ChurnAI — Intelligence de rétention SaaS"/>
+<meta property="og:description" content="Du signal brut à l'action, en autonomie. Six agents. Un objectif : la rétention."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,600&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#08090d;--surface:#0f1117;--surface-2:#161820;--border:#1d2132;--border-hi:#262d42;--text:#dce4f5;--text-2:#a0abc8;--muted:#596177;--accent:#3b82f6;--accent-2:#5596ff;--accent-lo:rgba(59,130,246,.11);--green:#22c55e;--green-lo:rgba(34,197,94,.10);--amber:#f59e0b;--red:#ef4444;--red-lo:rgba(239,68,68,.10);--purple:#a78bfa;--fh:'Syne',sans-serif;--fm:'JetBrains Mono',monospace;--ease:cubic-bezier(.4,0,.2,1);--r:12px;--r-lg:16px;--maxw:1140px}
+:root{
+  --paper:#f2eee4; --paper-2:#ebe5d7; --card:#fbf9f3; --ink:#14120c; --ink-2:#665f51; --ink-3:#9b9384;
+  --line:#d9d2c1; --line-2:#c6bda8;
+  --klein:#1d1ae6; --klein-deep:#1310a8; --klein-soft:#e6e5ff;
+  --verm:#dd4a2f; --ochre:#c5891b; --forest:#2e7a4a;
+  --f-disp:'Fraunces',serif; --f-sans:'Archivo',sans-serif; --f-mono:'Space Mono',monospace;
+  --ease:cubic-bezier(.22,.61,.36,1); --maxw:1240px;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
-body{font-family:var(--fh);background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;line-height:1.5}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth;text-rendering:optimizeLegibility}
+body{font-family:var(--f-sans);background:var(--paper);color:var(--ink);line-height:1.45;overflow-x:hidden;position:relative}
+/* grain */
+body::before{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.05;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 a{color:inherit;text-decoration:none}
 button,a.btn{font-family:inherit;cursor:pointer}
-::-webkit-scrollbar{width:8px}::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:8px}
-.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:700;border:none;transition:background .15s,transform 80ms,border-color .15s;white-space:nowrap}
-.btn:active{transform:scale(.97)}
-.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-2)}
-.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border-hi)}.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--fm);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:1.5px;color:var(--accent);background:var(--accent-lo);border:1px solid var(--border-hi);padding:6px 13px;border-radius:30px}
+::selection{background:var(--klein);color:#fff}
+::-webkit-scrollbar{width:9px}::-webkit-scrollbar-track{background:var(--paper)}::-webkit-scrollbar-thumb{background:var(--line-2)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(20px,4vw,52px)}
+.mono{font-family:var(--f-mono)}
+.eyebrow{font-family:var(--f-mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.22em;color:var(--klein)}
 
-/* ── Nav ── */
-nav.top{position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);background:rgba(8,9,13,.72);border-bottom:1px solid var(--border)}
-.nav-in{display:flex;align-items:center;gap:14px;height:64px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:-.4px}
-.brand .mark{width:32px;height:32px;border-radius:9px;background:var(--accent);display:grid;place-items:center}.brand .mark svg{width:17px;height:17px}
-.nav-links{display:flex;gap:26px;margin-left:32px}
-.nav-links a{font-size:14px;font-weight:600;color:var(--text-2);transition:color .15s}.nav-links a:hover{color:var(--text)}
-.nav-cta{margin-left:auto;display:flex;gap:10px;align-items:center}
-.gh-link{font-size:13px;font-weight:600;color:var(--text-2);display:flex;align-items:center;gap:6px}.gh-link:hover{color:var(--text)}
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:9px;padding:14px 24px;font-size:14px;font-weight:600;border:1.5px solid var(--ink);border-radius:0;transition:.22s var(--ease);position:relative;background:none;letter-spacing:.01em}
+.btn-fill{background:var(--ink);color:var(--paper)}
+.btn-fill:hover{background:var(--klein);border-color:var(--klein);transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--ink)}
+.btn-line{background:none;color:var(--ink)}
+.btn-line:hover{transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--klein);border-color:var(--klein);color:var(--klein)}
 
-/* ── Hero ── */
-.hero{position:relative;padding:96px 0 80px;text-align:center;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:900px;height:700px;background:radial-gradient(ellipse at center,rgba(59,130,246,.16),transparent 62%);pointer-events:none}
-.hero::after{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:54px 54px;opacity:.18;mask-image:radial-gradient(ellipse 70% 60% at 50% 30%,#000,transparent);pointer-events:none}
-.hero>*{position:relative;z-index:1}
-.hero h1{font-size:clamp(34px,6vw,62px);font-weight:800;letter-spacing:-2px;line-height:1.04;margin:22px auto 0;max-width:880px}
-.hero h1 .grad{background:linear-gradient(120deg,var(--accent-2),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p.sub{font-size:clamp(15px,2.2vw,19px);color:var(--text-2);max-width:600px;margin:22px auto 0;font-weight:400}
-.hero-cta{display:flex;gap:12px;justify-content:center;margin-top:34px;flex-wrap:wrap}
-.hero-note{margin-top:18px;font-family:var(--fm);font-size:12px;color:var(--muted)}
+/* ── ticker ── */
+.ticker{background:var(--ink);color:var(--paper);overflow:hidden;white-space:nowrap;border-bottom:1.5px solid var(--ink)}
+.ticker-track{display:inline-flex;gap:0;animation:scroll 34s linear infinite}
+.ticker-track span{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;padding:9px 0;display:inline-flex;align-items:center}
+.ticker-track span::after{content:'※';margin:0 26px;color:var(--klein)}
+@keyframes scroll{to{transform:translateX(-50%)}}
 
-/* ── Pipeline strip ── */
-.pipe{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;margin-top:46px}
-.pipe .node{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-2);background:var(--surface);border:1px solid var(--border);padding:8px 14px;border-radius:9px}
-.pipe .node .d{width:6px;height:6px;border-radius:50%;background:var(--accent)}
-.pipe .sep{color:var(--border-hi);font-size:14px}
+/* ── nav ── */
+nav.top{position:sticky;top:0;z-index:100;background:rgba(242,238,228,.82);backdrop-filter:blur(10px);border-bottom:1.5px solid var(--ink)}
+.nav-in{display:flex;align-items:center;height:70px;gap:30px}
+.brand{font-family:var(--f-disp);font-weight:900;font-size:25px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px}
+.brand .gl{width:13px;height:13px;background:var(--klein);border-radius:50%;display:inline-block;box-shadow:0 0 0 4px var(--klein-soft)}
+.nav-mid{display:flex;gap:30px;margin-left:14px}
+.nav-mid a{font-family:var(--f-mono);font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-2);position:relative;padding:4px 0}
+.nav-mid a::after{content:'';position:absolute;left:0;right:100%;bottom:0;height:1.5px;background:var(--klein);transition:right .3s var(--ease)}
+.nav-mid a:hover{color:var(--ink)}.nav-mid a:hover::after{right:0}
+.nav-r{margin-left:auto;display:flex;align-items:center;gap:14px}
+.nav-r .gh{font-family:var(--f-mono);font-size:12px;color:var(--ink-2);display:flex;align-items:center;gap:7px}.nav-r .gh:hover{color:var(--klein)}
 
-/* ── Stats ── */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:72px}
-.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 20px;text-align:center}
-.stat .n{font-family:var(--fm);font-size:32px;font-weight:800;letter-spacing:-1px;background:linear-gradient(120deg,var(--accent-2),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
-.stat .l{font-size:12px;color:var(--text-2);margin-top:8px;font-weight:600}
+/* ── hero ── */
+.hero{position:relative;padding:clamp(50px,9vw,104px) 0 clamp(40px,6vw,72px);border-bottom:1.5px solid var(--ink)}
+.hero-grid{display:grid;grid-template-columns:1fr;gap:36px}
+.hero .idx{position:absolute;top:24px;right:clamp(20px,4vw,52px);font-family:var(--f-mono);font-size:12px;color:var(--ink-3);letter-spacing:.1em;text-align:right;line-height:1.7}
+.hero h1{font-family:var(--f-disp);font-weight:600;font-size:clamp(46px,10vw,128px);line-height:.92;letter-spacing:-.025em;max-width:14ch}
+.hero h1 em{font-style:italic;font-weight:500;color:var(--klein)}
+.hero h1 .bk{display:inline-block;background:var(--klein);color:var(--paper);padding:0 .12em;transform:rotate(-1.2deg)}
+.deck{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:34px;align-items:end;margin-top:14px}
+.deck p{font-size:clamp(16px,1.9vw,20px);color:var(--ink-2);max-width:52ch;font-weight:400}
+.deck .cta{display:flex;gap:14px;flex-wrap:wrap}
+.hero-note{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);margin-top:18px;letter-spacing:.05em}
 
-/* ── Section shell ── */
-section.blk{padding:90px 0}
-.sec-head{text-align:center;max-width:640px;margin:0 auto 54px}
-.sec-head h2{font-size:clamp(26px,4vw,40px);font-weight:800;letter-spacing:-1px;margin-top:16px;line-height:1.1}
-.sec-head p{color:var(--text-2);margin-top:14px;font-size:16px}
+/* reveal */
+.rev{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.rev.in{opacity:1;transform:none}
 
-/* ── How it works ── */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-.step{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:28px 24px;position:relative;transition:border-color .2s,transform .2s}
-.step:hover{border-color:var(--border-hi);transform:translateY(-3px)}
-.step .num{font-family:var(--fm);font-size:12px;font-weight:500;color:var(--accent);background:var(--accent-lo);width:34px;height:34px;border-radius:9px;display:grid;place-items:center;margin-bottom:16px}
-.step h3{font-size:17px;font-weight:700;margin-bottom:8px}
-.step p{font-size:14px;color:var(--text-2)}
+/* ── pipeline strip ── */
+.flow{border-bottom:1.5px solid var(--ink);background:var(--paper-2)}
+.flow-in{display:grid;grid-template-columns:repeat(6,1fr)}
+.flow-step{padding:26px clamp(14px,1.6vw,22px);border-left:1px solid var(--line);position:relative;transition:background .3s}
+.flow-step:first-child{border-left:none}
+.flow-step:hover{background:var(--card)}
+.flow-step .n{font-family:var(--f-mono);font-size:11px;color:var(--klein);letter-spacing:.1em}
+.flow-step h4{font-family:var(--f-disp);font-weight:600;font-size:21px;margin:14px 0 5px;letter-spacing:-.01em}
+.flow-step p{font-size:12.5px;color:var(--ink-2);line-height:1.5}
 
-/* ── Agents grid ── */
-.agents{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.ag{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;transition:border-color .2s,transform .2s}
-.ag:hover{border-color:var(--border-hi);transform:translateY(-3px)}
-.ag .ico{font-size:26px;margin-bottom:14px}
-.ag h3{font-size:16px;font-weight:700;margin-bottom:7px}
-.ag p{font-size:13.5px;color:var(--text-2)}
-.ag .tag{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-family:var(--fm);font-size:10.5px;color:var(--muted)}
-.ag .tag .dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
-.ag .tag.cl .dot{background:var(--accent)}
+/* ── section ── */
+section{padding:clamp(64px,9vw,120px) 0;border-bottom:1.5px solid var(--ink)}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:baseline;margin-bottom:56px}
+.sec-head h2{font-family:var(--f-disp);font-weight:600;font-size:clamp(30px,5vw,58px);line-height:1;letter-spacing:-.02em}
+.sec-head .lead{font-size:16px;color:var(--ink-2);max-width:48ch}
+.sec-head .lead .eyebrow{display:block;margin-bottom:14px}
 
-/* ── Features split ── */
-.feat{display:grid;grid-template-columns:1fr 1fr;gap:46px;align-items:center}
-.feat.rev{direction:rtl}.feat.rev>*{direction:ltr}
-.feat-txt h3{font-size:26px;font-weight:800;letter-spacing:-.6px;margin-bottom:14px}
-.feat-txt p{color:var(--text-2);font-size:15px;margin-bottom:20px}
-.feat-list{list-style:none;display:flex;flex-direction:column;gap:12px}
-.feat-list li{display:flex;gap:11px;font-size:14px;font-weight:600}
-.feat-list li .ck{color:var(--green);flex-shrink:0;margin-top:2px}
-.feat-list li span.d{font-weight:400;color:var(--text-2)}
-.mock{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:0 30px 80px -40px rgba(59,130,246,.4)}
-.mock-bar{display:flex;gap:6px;margin-bottom:16px}.mock-bar i{width:11px;height:11px;border-radius:50%;background:var(--border-hi)}
-.mrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}.mrow:last-child{border:none}
-.mrow .cid{font-family:var(--fm);font-size:11px;color:var(--text-2);width:74px}
-.mbar{flex:1;height:5px;background:var(--surface-2);border-radius:3px;overflow:hidden}.mbar i{display:block;height:100%;border-radius:3px}
-.mscore{font-family:var(--fm);font-size:11px;font-weight:500;width:34px;text-align:right}
-.badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:3px 8px;border-radius:5px}
-.bc{background:var(--red-lo);color:var(--red)}.bh{background:rgba(245,158,11,.12);color:var(--amber)}.bl{background:var(--green-lo);color:var(--green)}
+/* ── agents index ── */
+.index-list{border-top:1.5px solid var(--ink)}
+.row{display:grid;grid-template-columns:64px 1.1fr 2fr 150px;gap:24px;align-items:center;padding:26px 8px;border-bottom:1px solid var(--line);transition:.3s var(--ease);position:relative}
+.row::before{content:'';position:absolute;inset:0;background:var(--ink);transform:scaleY(0);transform-origin:bottom;transition:transform .35s var(--ease);z-index:0}
+.row>*{position:relative;z-index:1;transition:color .3s}
+.row:hover::before{transform:scaleY(1)}
+.row:hover, .row:hover .r-desc, .row:hover .r-meta{color:var(--paper)}
+.row:hover .r-num{color:var(--klein)}
+.row:hover .r-name{color:var(--paper)}
+.r-num{font-family:var(--f-mono);font-size:13px;color:var(--ink-3)}
+.r-name{font-family:var(--f-disp);font-size:clamp(22px,2.6vw,32px);font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:12px}
+.r-name .ico{font-size:.8em}
+.r-desc{font-size:14px;color:var(--ink-2);line-height:1.5}
+.r-meta{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);text-align:right}
+.r-meta .tag-cl{color:var(--klein)}
+.row:hover .r-meta .tag-cl{color:#a5a3ff}
 
-/* ── CTA band ── */
-.cta-band{margin:0 24px;background:linear-gradient(135deg,rgba(59,130,246,.14),rgba(167,139,250,.10));border:1px solid var(--border-hi);border-radius:24px;padding:64px 32px;text-align:center;position:relative;overflow:hidden}
-.cta-band h2{font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-1px;max-width:560px;margin:0 auto}
-.cta-band p{color:var(--text-2);margin:16px auto 30px;max-width:480px;font-size:16px}
+/* ── features ── */
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:clamp(36px,6vw,90px);align-items:center;margin-bottom:clamp(60px,8vw,110px)}
+.feat:last-child{margin-bottom:0}
+.feat.flip .f-vis{order:-1}
+.f-txt .eyebrow{display:block;margin-bottom:16px}
+.f-txt h3{font-family:var(--f-disp);font-weight:600;font-size:clamp(26px,3.4vw,42px);line-height:1.02;letter-spacing:-.02em;margin-bottom:18px}
+.f-txt p{font-size:15.5px;color:var(--ink-2);margin-bottom:24px;max-width:42ch}
+.f-txt ul{list-style:none;display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line)}
+.f-txt li{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:16px 0;border-bottom:1px solid var(--line);font-size:14.5px;font-weight:600;align-items:start}
+.f-txt li .k{font-family:var(--f-mono);color:var(--klein);font-size:13px}
+.f-txt li span.d{display:block;font-weight:400;color:var(--ink-2);margin-top:3px;font-size:13.5px}
 
-/* ── Footer ── */
-footer{border-top:1px solid var(--border);padding:48px 0 40px;margin-top:90px}
-.foot-in{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap}
-.foot-brand{max-width:300px}.foot-brand p{color:var(--muted);font-size:13px;margin-top:12px}
-.foot-cols{display:flex;gap:64px;flex-wrap:wrap}
-.foot-col h4{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:14px;font-weight:700}
-.foot-col a{display:block;font-size:14px;color:var(--text-2);margin-bottom:10px;font-weight:600}.foot-col a:hover{color:var(--text)}
-.foot-bottom{margin-top:40px;padding-top:24px;border-top:1px solid var(--border);font-family:var(--fm);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+/* visual card */
+.f-vis{background:var(--card);border:1.5px solid var(--ink);box-shadow:10px 10px 0 var(--ink);padding:26px}
+.vh{display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid var(--ink);padding-bottom:14px;margin-bottom:18px}
+.vh .t{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em}
+.vh .dot{width:9px;height:9px;border-radius:50%;background:var(--verm)}
+.vrow{display:grid;grid-template-columns:84px 1fr 46px 78px;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.vrow:last-child{border:none}
+.vrow .cid{font-family:var(--f-mono);font-size:12px;color:var(--ink-2)}
+.vbar{height:7px;background:var(--paper-2);overflow:hidden}.vbar i{display:block;height:100%}
+.vscore{font-family:var(--f-mono);font-size:13px;font-weight:700;text-align:right}
+.chip{font-family:var(--f-mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:4px 7px;text-align:center}
+.chip.cr{background:#fae2db;color:var(--verm)}.chip.hi{background:#f6ebd4;color:var(--ochre)}.chip.me{background:var(--klein-soft);color:var(--klein)}.chip.lo{background:#dcefe3;color:var(--forest)}
+.mail .lbl{font-family:var(--f-mono);font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3);margin:14px 0 6px}
+.mail .subj{font-family:var(--f-disp);font-size:19px;font-weight:600;letter-spacing:-.01em}
+.mail .body{font-size:13.5px;color:var(--ink-2);line-height:1.6;margin-top:6px}
+.mail .tags{display:flex;gap:8px;margin-top:16px}
 
-@media(max-width:880px){
-  .nav-links{display:none}
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .steps,.agents{grid-template-columns:1fr}
-  .feat,.feat.rev{grid-template-columns:1fr;direction:ltr}
-  .feat .mock{order:-1}
-  section.blk{padding:64px 0}
+/* ── ROI band (inverted) ── */
+.roi-band{background:var(--klein);color:var(--paper);border-bottom:1.5px solid var(--ink)}
+.roi-band .eyebrow{color:#bfbeff}
+.roi-band h2{font-family:var(--f-disp);font-weight:600;font-size:clamp(30px,5vw,56px);line-height:1;letter-spacing:-.02em;max-width:18ch;margin:18px 0 0}
+.roi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;border-top:1px solid rgba(255,255,255,.28)}
+.roi-cell{padding:30px 22px;border-left:1px solid rgba(255,255,255,.28)}
+.roi-cell:first-child{border-left:none}
+.roi-cell .big{font-family:var(--f-disp);font-weight:500;font-size:clamp(38px,5vw,62px);line-height:1;letter-spacing:-.02em}
+.roi-cell .lbl{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#cfceff;margin-top:14px}
+
+/* ── final CTA ── */
+.final{text-align:center;padding:clamp(80px,11vw,150px) 0}
+.final h2{font-family:var(--f-disp);font-weight:600;font-size:clamp(38px,8vw,104px);line-height:.95;letter-spacing:-.03em}
+.final h2 em{font-style:italic;color:var(--klein)}
+.final p{font-size:17px;color:var(--ink-2);max-width:46ch;margin:26px auto 36px}
+
+/* ── footer ── */
+footer{background:var(--ink);color:var(--paper);padding:64px 0 40px}
+.foot-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px}
+.foot-brand .brand{color:var(--paper)}
+.foot-brand p{color:#9b9384;font-size:13.5px;margin-top:14px;max-width:30ch}
+.fcol h5{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:#7c7567;margin-bottom:16px}
+.fcol a{display:block;font-size:14px;color:#cfc8b9;margin-bottom:11px}.fcol a:hover{color:var(--klein);padding-left:6px;transition:.2s}
+.foot-bot{margin-top:54px;padding-top:24px;border-top:1px solid #2c2920;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font-family:var(--f-mono);font-size:11px;color:#7c7567;letter-spacing:.05em}
+
+@media(max-width:920px){
+  .nav-mid{display:none}
+  .flow-in{grid-template-columns:repeat(2,1fr)}
+  .flow-step{border-top:1px solid var(--line)}
+  .flow-step:nth-child(-n+2){border-top:none}
+  .sec-head{grid-template-columns:1fr;gap:20px}
+  .row{grid-template-columns:40px 1fr;gap:12px}
+  .r-desc,.r-meta{display:none}
+  .feat,.feat.flip{grid-template-columns:1fr;gap:34px}
+  .feat.flip .f-vis{order:0}
+  .roi-grid{grid-template-columns:1fr 1fr}.roi-cell:nth-child(-n+2){}
+  .foot-top{grid-template-columns:1fr 1fr}
 }
-@media(max-width:520px){.stats{grid-template-columns:1fr 1fr}.nav-cta .btn-ghost{display:none}}
+@media(max-width:540px){.deck{grid-template-columns:1fr}.roi-grid{grid-template-columns:1fr}.roi-cell{border-left:none;border-top:1px solid rgba(255,255,255,.28)}.nav-r .gh{display:none}}
 </style>
 </head>
 <body>
 
+<div class="ticker"><div class="ticker-track" id="tk">
+  <span>SIGNAL → ANALYSE → PRÉDICTION → DÉCISION → ACTION → ROI</span>
+  <span>SCORING DE CHURN 0→1 PAR CLIENT</span>
+  <span>SIX AGENTS · UN OBJECTIF : LA RÉTENTION</span>
+  <span>RAISONNEMENT PROPULSÉ PAR CLAUDE</span>
+  <span>PIPELINE COMPLET EN MOINS D'UNE SECONDE</span>
+</div></div>
+
 <nav class="top">
   <div class="wrap nav-in">
-    <a class="brand" href="#top">
-      <span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7V17L12 22L21 17V7Z" fill="white" fill-opacity=".9"/><path d="M12 7L7 10V14L12 17L17 14V10Z" fill="white" fill-opacity=".45"/><circle cx="12" cy="12" r="2.2" fill="white"/></svg></span>
-      ChurnAI
-    </a>
-    <div class="nav-links">
-      <a href="#how">Fonctionnement</a>
+    <a class="brand" href="#top"><span class="gl"></span>ChurnAI</a>
+    <div class="nav-mid">
+      <a href="#flow">Pipeline</a>
       <a href="#agents">Agents</a>
-      <a href="#features">Fonctionnalités</a>
-      <a href="#roi">ROI</a>
+      <a href="#features">Capacités</a>
+      <a href="#roi">Impact</a>
     </div>
-    <div class="nav-cta">
-      <a class="gh-link" href="https://github.com/Aliou-Root/churn-ai" target="_blank" rel="noopener">
-        <svg width="17" height="17" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-        GitHub
-      </a>
-      <a class="btn btn-ghost" href="app.html">Démo live</a>
-      <a class="btn btn-primary" href="app.html">Ouvrir le dashboard</a>
+    <div class="nav-r">
+      <a class="gh" href="https://github.com/Aliou-Root/churn-ai" target="_blank" rel="noopener">[ GITHUB ]</a>
+      <a class="btn btn-fill" href="app.html" style="padding:10px 18px;font-size:13px">Dashboard →</a>
     </div>
   </div>
 </nav>
 
 <header class="hero" id="top">
-  <div class="wrap">
-    <span class="eyebrow">⬤ Multi-agent · Propulsé par Claude</span>
-    <h1>Arrêtez le churn <span class="grad">avant qu'il arrive</span>.</h1>
-    <p class="sub">ChurnAI surveille vos clients SaaS en continu, prédit qui s'apprête à partir, et déclenche la bonne action de rétention — le tout en autonomie, sans toucher à votre roadmap.</p>
-    <div class="hero-cta">
-      <a class="btn btn-primary" href="app.html">▶&nbsp; Lancer la démo</a>
-      <a class="btn btn-ghost" href="#how">Voir comment ça marche</a>
-    </div>
-    <div class="hero-note">Aucune clé requise pour la démo · pipeline déterministe + raisonnement Claude optionnel</div>
-
-    <div class="pipe">
-      <div class="node"><span class="d"></span>Data</div><span class="sep">›</span>
-      <div class="node"><span class="d"></span>Analyse</div><span class="sep">›</span>
-      <div class="node"><span class="d"></span>Prédiction</div><span class="sep">›</span>
-      <div class="node"><span class="d"></span>Décision</div><span class="sep">›</span>
-      <div class="node"><span class="d"></span>Action</div><span class="sep">›</span>
-      <div class="node"><span class="d"></span>ROI</div>
-    </div>
-
-    <div class="stats">
-      <div class="stat"><div class="n">6</div><div class="l">agents spécialisés</div></div>
-      <div class="stat"><div class="n">&lt;1s</div><div class="l">par run de pipeline</div></div>
-      <div class="stat"><div class="n">0→1</div><div class="l">scoring de churn par client</div></div>
-      <div class="stat"><div class="n">100%</div><div class="l">actions traçables</div></div>
+  <div class="wrap hero-grid">
+    <div class="idx">No. 01 — 2026<br/>RÉTENTION SAAS<br/>MULTI-AGENTS</div>
+    <h1 class="rev in">Le départ d'un client se <em>voit</em> venir. <span class="bk">Agissez avant.</span></h1>
+    <div class="deck rev in" style="transition-delay:.1s">
+      <p>ChurnAI lit les signaux faibles de vos abonnés, prédit qui s'apprête à partir et déclenche la bonne action de rétention — en autonomie, sans toucher à votre roadmap.</p>
+      <div>
+        <div class="cta">
+          <a class="btn btn-fill" href="app.html">▶ Lancer la démo</a>
+          <a class="btn btn-line" href="#flow">Voir le pipeline</a>
+        </div>
+        <div class="hero-note">// aucune clé requise pour la démo · pipeline déterministe + claude optionnel</div>
+      </div>
     </div>
   </div>
 </header>
 
-<section class="blk" id="how">
+<section class="flow" id="flow" style="padding:0">
+  <div class="flow-in">
+    <div class="flow-step rev"><div class="n">01 / DATA</div><h4>Collecte</h4><p>Abonnements Stripe + logs d'usage agrégés en un dataset normalisé.</p></div>
+    <div class="flow-step rev" style="transition-delay:.05s"><div class="n">02 / SIGNAL</div><h4>Analyse</h4><p>Détection des signaux : connexions, adoption, paiement, intention de départ.</p></div>
+    <div class="flow-step rev" style="transition-delay:.1s"><div class="n">03 / SCORE</div><h4>Prédiction</h4><p>Score de churn 0→1, niveau de risque et jours estimés avant départ.</p></div>
+    <div class="flow-step rev" style="transition-delay:.15s"><div class="n">04 / REASON</div><h4>Décision</h4><p>Règles + arbitrage Claude sur les cas limites et les patterns systémiques.</p></div>
+    <div class="flow-step rev" style="transition-delay:.2s"><div class="n">05 / ACT</div><h4>Action</h4><p>Emails rédigés par Claude, remises Stripe, appels CSM. Réel ou simulé.</p></div>
+    <div class="flow-step rev" style="transition-delay:.25s"><div class="n">06 / VALUE</div><h4>ROI</h4><p>Revenus à risque, revenus sauvés et retour sur investissement chiffrés.</p></div>
+  </div>
+</section>
+
+<section id="agents">
   <div class="wrap">
     <div class="sec-head">
-      <span class="eyebrow">Le pipeline</span>
-      <h2>Du signal brut à l'action, en six étapes</h2>
-      <p>Chaque client traverse un pipeline d'agents orchestré. Les étapes déterministes tournent en Python ; le raisonnement stratégique et la rédaction sont délégués à Claude.</p>
+      <h2 class="rev">Une rédaction<br/>de six agents.</h2>
+      <div class="lead rev" style="transition-delay:.08s">
+        <span class="eyebrow">L'équipe</span>
+        Trois agents déterministes en Python pur garantissent vitesse et fiabilité. Trois agents Claude apportent la couche de raisonnement que les règles ne savent pas couvrir.
+      </div>
     </div>
-    <div class="steps">
-      <div class="step"><div class="num">01</div><h3>📡 Collecte</h3><p>Le Data Agent agrège abonnements Stripe et logs d'usage produit en un dataset normalisé (données de démo si aucune clé).</p></div>
-      <div class="step"><div class="num">02</div><h3>🔍 Analyse</h3><p>Détection de signaux comportementaux : connexions en baisse, adoption faible, échecs de paiement, intention de résiliation.</p></div>
-      <div class="step"><div class="num">03</div><h3>🎯 Prédiction</h3><p>Conversion des signaux en score de churn 0→1 et niveau de risque (low → critical), avec estimation des jours restants.</p></div>
-      <div class="step"><div class="num">04</div><h3>🧠 Décision</h3><p>Un moteur de règles choisit l'action optimale. Claude (CEO Agent) arbitre les cas limites et détecte les patterns systémiques.</p></div>
-      <div class="step"><div class="num">05</div><h3>⚡ Action</h3><p>Emails personnalisés par Claude, remises Stripe, appels CSM. Exécution réelle ou simulée selon vos intégrations.</p></div>
-      <div class="step"><div class="num">06</div><h3>📈 ROI</h3><p>Le Finance Agent chiffre les revenus à risque, les revenus sauvés et le ratio de retour sur investissement de l'outil.</p></div>
+    <div class="index-list rev">
+      <div class="row">
+        <div class="r-num">A—01</div>
+        <div class="r-name"><span class="ico">📡</span>Data</div>
+        <div class="r-desc">Collecte et normalise les abonnements Stripe et les logs produit en un dataset propre.</div>
+        <div class="r-meta">Python · déterministe</div>
+      </div>
+      <div class="row">
+        <div class="r-num">A—02</div>
+        <div class="r-name"><span class="ico">🔍</span>Analyse</div>
+        <div class="r-desc">Repère les signaux comportementaux et les pondère en un score de risque brut.</div>
+        <div class="r-meta">Python · déterministe</div>
+      </div>
+      <div class="row">
+        <div class="r-num">A—03</div>
+        <div class="r-name"><span class="ico">🎯</span>Prédiction</div>
+        <div class="r-desc">Convertit les signaux en probabilité de churn 0→1 — prêt pour un modèle ML.</div>
+        <div class="r-meta">Python · déterministe</div>
+      </div>
+      <div class="row">
+        <div class="r-num">A—04</div>
+        <div class="r-name"><span class="ico">🧠</span>CEO Strategist</div>
+        <div class="r-desc">Arbitre les cas limites, détecte les patterns systémiques, écrit le résumé exécutif.</div>
+        <div class="r-meta"><span class="tag-cl">Claude Sonnet 4.6</span></div>
+      </div>
+      <div class="row">
+        <div class="r-num">A—05</div>
+        <div class="r-name"><span class="ico">✉️</span>Communication</div>
+        <div class="r-desc">Rédige emails et scripts d'appel personnalisés selon le profil de chaque client.</div>
+        <div class="r-meta"><span class="tag-cl">Claude Sonnet 4.6</span></div>
+      </div>
+      <div class="row">
+        <div class="r-num">A—06</div>
+        <div class="r-name"><span class="ico">💰</span>Finance</div>
+        <div class="r-desc">Chiffre revenus à risque, revenus sauvés et ratio de retour sur investissement.</div>
+        <div class="r-meta">Python · déterministe</div>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="blk" id="agents" style="background:var(--surface);border-block:1px solid var(--border)">
+<section id="features">
   <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">L'équipe d'agents</span>
-      <h2>Six agents, un seul objectif : la rétention</h2>
-      <p>Les agents déterministes garantissent vitesse et fiabilité. Les agents Claude apportent la couche de raisonnement que les règles ne peuvent pas couvrir.</p>
-    </div>
-    <div class="agents">
-      <div class="ag"><div class="ico">🧠</div><h3>CEO Strategist</h3><p>Arbitre les cas limites, détecte les patterns systémiques sur l'ensemble du portefeuille et produit un résumé exécutif.</p><div class="tag cl"><span class="dot"></span>Claude Sonnet 4.6</div></div>
-      <div class="ag"><div class="ico">✉️</div><h3>Communication Writer</h3><p>Rédige emails et scripts d'appel personnalisés selon le contexte comportemental de chaque client.</p><div class="tag cl"><span class="dot"></span>Claude Sonnet 4.6</div></div>
-      <div class="ag"><div class="ico">📊</div><h3>Weekly Analyst</h3><p>Rapport hebdomadaire agrégé sur les tendances de churn, l'efficacité des actions et les alertes fondateurs.</p><div class="tag cl"><span class="dot"></span>Claude Sonnet 4.6</div></div>
-      <div class="ag"><div class="ico">📡</div><h3>Data Agent</h3><p>Collecte et normalise les données Stripe et les logs produit. Pipeline Python pur, aucun appel IA.</p><div class="tag"><span class="dot"></span>Python · déterministe</div></div>
-      <div class="ag"><div class="ico">🔎</div><h3>Analysis + Prediction</h3><p>Signaux comportementaux et scoring de churn 0→1. Heuristique prête à être remplacée par un modèle ML.</p><div class="tag"><span class="dot"></span>Python · déterministe</div></div>
-      <div class="ag"><div class="ico">💰</div><h3>Finance Agent</h3><p>Calcule revenus à risque, revenus sauvés et ROI. Métriques business en Python pur.</p><div class="tag"><span class="dot"></span>Python · déterministe</div></div>
-    </div>
-  </div>
-</section>
-
-<section class="blk" id="features">
-  <div class="wrap" style="display:flex;flex-direction:column;gap:80px">
 
     <div class="feat">
-      <div class="feat-txt">
-        <span class="eyebrow">Détection</span>
-        <h3>Une churn risk list, classée et expliquée</h3>
-        <p>Chaque client à risque arrive avec son score, son niveau, le MRR exposé et les facteurs déclencheurs. Plus de devinettes — vous savez qui contacter en premier.</p>
-        <ul class="feat-list">
-          <li><span class="ck">✓</span><div>Scoring 0→1 par client <span class="d">avec niveaux low / medium / high / critical</span></div></li>
-          <li><span class="ck">✓</span><div>Estimation des jours restants <span class="d">avant la résiliation prédite</span></div></li>
-          <li><span class="ck">✓</span><div>Facteurs explicatifs <span class="d">— pourquoi ce client est à risque</span></div></li>
+      <div class="f-txt rev">
+        <span class="eyebrow">// Détection</span>
+        <h3>Une liste classée, et expliquée.</h3>
+        <p>Chaque client à risque arrive avec son score, son niveau, le MRR exposé et les facteurs déclencheurs. Vous savez qui contacter d'abord — et pourquoi.</p>
+        <ul>
+          <li><span class="k">01</span><div>Scoring 0→1 par client<span class="d">low · medium · high · critical</span></div></li>
+          <li><span class="k">02</span><div>Fenêtre estimée<span class="d">jours restants avant la résiliation prédite</span></div></li>
+          <li><span class="k">03</span><div>Facteurs explicatifs<span class="d">les signaux qui motivent chaque score</span></div></li>
         </ul>
       </div>
-      <div class="mock">
-        <div class="mock-bar"><i></i><i></i><i></i></div>
-        <div class="mrow"><span class="cid">cus_0007</span><div class="mbar"><i style="width:91%;background:var(--red)"></i></div><span class="mscore" style="color:var(--red)">91%</span><span class="badge bc">critical</span></div>
-        <div class="mrow"><span class="cid">cus_0014</span><div class="mbar"><i style="width:83%;background:var(--red)"></i></div><span class="mscore" style="color:var(--red)">83%</span><span class="badge bc">critical</span></div>
-        <div class="mrow"><span class="cid">cus_0003</span><div class="mbar"><i style="width:71%;background:var(--amber)"></i></div><span class="mscore" style="color:var(--amber)">71%</span><span class="badge bh">high</span></div>
-        <div class="mrow"><span class="cid">cus_0010</span><div class="mbar"><i style="width:44%;background:var(--purple)"></i></div><span class="mscore" style="color:var(--purple)">44%</span><span class="badge bl">medium</span></div>
+      <div class="f-vis rev" style="transition-delay:.1s">
+        <div class="vh"><span class="t">Churn risk list</span><span class="dot"></span></div>
+        <div class="vrow"><span class="cid">cus_0007</span><div class="vbar"><i style="width:91%;background:var(--verm)"></i></div><span class="vscore" style="color:var(--verm)">91</span><span class="chip cr">critical</span></div>
+        <div class="vrow"><span class="cid">cus_0014</span><div class="vbar"><i style="width:83%;background:var(--verm)"></i></div><span class="vscore" style="color:var(--verm)">83</span><span class="chip cr">critical</span></div>
+        <div class="vrow"><span class="cid">cus_0003</span><div class="vbar"><i style="width:71%;background:var(--ochre)"></i></div><span class="vscore" style="color:var(--ochre)">71</span><span class="chip hi">high</span></div>
+        <div class="vrow"><span class="cid">cus_0010</span><div class="vbar"><i style="width:44%;background:var(--klein)"></i></div><span class="vscore" style="color:var(--klein)">44</span><span class="chip me">medium</span></div>
+        <div class="vrow"><span class="cid">cus_0021</span><div class="vbar"><i style="width:22%;background:var(--forest)"></i></div><span class="vscore" style="color:var(--forest)">22</span><span class="chip lo">low</span></div>
       </div>
     </div>
 
-    <div class="feat rev">
-      <div class="feat-txt">
-        <span class="eyebrow">Action</span>
-        <h3>Des messages écrits par Claude, pas des templates</h3>
-        <p>Le Communication Agent adapte le ton, le sujet et le contenu à chaque client : ancienneté, plan, dernières connexions, tickets support. Empathique pour un client en difficulté, direct pour un fondateur pressé.</p>
-        <ul class="feat-list">
-          <li><span class="ck">✓</span><div>10 règles de personnalisation <span class="d">selon le profil comportemental</span></div></li>
-          <li><span class="ck">✓</span><div>Fallback templates <span class="d">si Claude n'est pas configuré</span></div></li>
-          <li><span class="ck">✓</span><div>Mode dry-run <span class="d">pour simuler sans rien envoyer</span></div></li>
+    <div class="feat flip">
+      <div class="f-txt rev">
+        <span class="eyebrow">// Action</span>
+        <h3>Des messages écrits, pas générés.</h3>
+        <p>Le Communication Agent adapte ton, objet et contenu à chaque client : ancienneté, plan, dernières connexions, tickets support. Empathique pour qui doute, direct pour qui est pressé.</p>
+        <ul>
+          <li><span class="k">01</span><div>10 règles de personnalisation<span class="d">selon le profil comportemental réel</span></div></li>
+          <li><span class="k">02</span><div>Templates de repli<span class="d">si Claude n'est pas configuré</span></div></li>
+          <li><span class="k">03</span><div>Mode dry-run<span class="d">simuler tout le pipeline sans rien envoyer</span></div></li>
         </ul>
       </div>
-      <div class="mock">
-        <div class="mock-bar"><i></i><i></i><i></i></div>
-        <div style="font-family:var(--fm);font-size:11px;color:var(--muted);margin-bottom:6px">SUBJECT</div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:14px">On a remarqué un souci — réglons-le en 30 s</div>
-        <div style="font-family:var(--fm);font-size:11px;color:var(--muted);margin-bottom:6px">BODY · ton empathique</div>
-        <div style="font-size:13px;color:var(--text-2);line-height:1.6">Bonjour Sarah,<br>Votre dernier paiement n'a pas pu être traité — aucune inquiétude, ça arrive. Mettez à jour votre moyen de paiement ici et tout repart immédiatement…</div>
-        <div style="margin-top:14px;display:flex;gap:8px"><span class="badge" style="background:var(--accent-lo);color:var(--accent)">Claude ✓</span><span class="badge bl">billing_failure</span></div>
+      <div class="f-vis mail rev" style="transition-delay:.1s">
+        <div class="vh"><span class="t">Communication · draft</span><span class="chip me">Claude</span></div>
+        <div class="lbl">Objet</div>
+        <div class="subj">On a vu un souci — réglons-le en 30 s</div>
+        <div class="lbl">Corps · ton empathique</div>
+        <div class="body">Bonjour Sarah,<br/>Votre dernier paiement n'a pas pu être traité — aucune inquiétude, ça arrive. Mettez à jour votre moyen de paiement ici et tout repart immédiatement.</div>
+        <div class="tags"><span class="chip lo">billing_failure</span><span class="chip hi">mrr &gt; 150</span></div>
       </div>
     </div>
 
   </div>
 </section>
 
-<section class="blk" id="roi" style="background:var(--surface);border-block:1px solid var(--border)">
+<section class="roi-band" id="roi">
   <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">Impact business</span>
-      <h2>Le churn évité se mesure en euros</h2>
-      <p>Le Finance Agent transforme chaque action de rétention réussie en impact financier concret, consolidé dans un dashboard temps réel.</p>
-    </div>
-    <div class="stats" style="margin-top:0">
-      <div class="stat"><div class="n">€/mois</div><div class="l">revenus à risque détectés</div></div>
-      <div class="stat"><div class="n">€/mois</div><div class="l">revenus récupérés</div></div>
-      <div class="stat"><div class="n">×ROI</div><div class="l">retour / coût de l'outil</div></div>
-      <div class="stat"><div class="n">%</div><div class="l">taux de succès des actions</div></div>
+    <span class="eyebrow rev">// Impact business</span>
+    <h2 class="rev" style="transition-delay:.06s">Le churn évité se mesure en euros.</h2>
+    <div class="roi-grid rev" style="transition-delay:.12s">
+      <div class="roi-cell"><div class="big">€ /mo</div><div class="lbl">revenus à risque détectés</div></div>
+      <div class="roi-cell"><div class="big">€ /mo</div><div class="lbl">revenus récupérés</div></div>
+      <div class="roi-cell"><div class="big">× ROI</div><div class="lbl">retour / coût de l'outil</div></div>
+      <div class="roi-cell"><div class="big">%</div><div class="lbl">taux de succès des actions</div></div>
     </div>
   </div>
 </section>
 
-<div class="cta-band">
-  <h2>Prêt à voir ChurnAI à l'œuvre&nbsp;?</h2>
-  <p>Lancez le pipeline complet en un clic dans le dashboard de démonstration — données simulées incluses, aucune configuration requise.</p>
-  <a class="btn btn-primary" href="app.html" style="padding:14px 28px;font-size:15px">▶&nbsp; Ouvrir le dashboard</a>
-</div>
+<section class="final" style="border-bottom:none">
+  <div class="wrap">
+    <h2 class="rev">Voyez-le <em>tourner.</em></h2>
+    <p class="rev" style="transition-delay:.08s">Lancez le pipeline complet en un clic dans le dashboard de démonstration. Données simulées incluses, zéro configuration.</p>
+    <div class="rev" style="transition-delay:.14s"><a class="btn btn-fill" href="app.html" style="padding:18px 34px;font-size:16px">▶ Ouvrir le dashboard</a></div>
+  </div>
+</section>
 
 <footer>
   <div class="wrap">
-    <div class="foot-in">
+    <div class="foot-top">
       <div class="foot-brand">
-        <a class="brand" href="#top">
-          <span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7V17L12 22L21 17V7Z" fill="white" fill-opacity=".9"/><path d="M12 7L7 10V14L12 17L17 14V10Z" fill="white" fill-opacity=".45"/><circle cx="12" cy="12" r="2.2" fill="white"/></svg></span>
-          ChurnAI
-        </a>
-        <p>Prévention autonome du churn SaaS par système multi-agents, propulsée par Claude.</p>
+        <a class="brand" href="#top"><span class="gl"></span>ChurnAI</a>
+        <p>Intelligence de rétention SaaS par système multi-agents, propulsée par Claude.</p>
       </div>
-      <div class="foot-cols">
-        <div class="foot-col">
-          <h4>Produit</h4>
-          <a href="#how">Fonctionnement</a>
-          <a href="#agents">Agents</a>
-          <a href="#features">Fonctionnalités</a>
-          <a href="app.html">Dashboard</a>
-        </div>
-        <div class="foot-col">
-          <h4>Ressources</h4>
-          <a href="https://github.com/Aliou-Root/churn-ai" target="_blank" rel="noopener">Code source</a>
-          <a href="https://github.com/Aliou-Root/churn-ai#readme" target="_blank" rel="noopener">Documentation</a>
-          <a href="https://github.com/Aliou-Root/churn-ai/blob/main/docker-compose.yml" target="_blank" rel="noopener">Déploiement</a>
-        </div>
-        <div class="foot-col">
-          <h4>Stack</h4>
-          <a href="https://fastapi.tiangolo.com" target="_blank" rel="noopener">FastAPI</a>
-          <a href="https://www.anthropic.com" target="_blank" rel="noopener">Claude API</a>
-          <a href="https://www.postgresql.org" target="_blank" rel="noopener">PostgreSQL</a>
-        </div>
+      <div class="fcol">
+        <h5>Produit</h5>
+        <a href="#flow">Pipeline</a><a href="#agents">Agents</a><a href="#features">Capacités</a><a href="app.html">Dashboard</a>
+      </div>
+      <div class="fcol">
+        <h5>Ressources</h5>
+        <a href="https://github.com/Aliou-Root/churn-ai" target="_blank" rel="noopener">Code source</a>
+        <a href="https://github.com/Aliou-Root/churn-ai#readme" target="_blank" rel="noopener">Documentation</a>
+        <a href="https://github.com/Aliou-Root/churn-ai/blob/main/docker-compose.yml" target="_blank" rel="noopener">Déploiement</a>
+      </div>
+      <div class="fcol">
+        <h5>Stack</h5>
+        <a href="https://fastapi.tiangolo.com" target="_blank" rel="noopener">FastAPI</a>
+        <a href="https://www.anthropic.com" target="_blank" rel="noopener">Claude</a>
+        <a href="https://www.postgresql.org" target="_blank" rel="noopener">PostgreSQL</a>
       </div>
     </div>
-    <div class="foot-bottom">
-      <span>© 2026 ChurnAI · Licence MIT</span>
-      <span>Construit avec FastAPI · Claude · PostgreSQL · Redis</span>
+    <div class="foot-bot">
+      <span>© 2026 CHURNAI — LICENCE MIT</span>
+      <span>FASTAPI · CLAUDE · POSTGRESQL · REDIS</span>
     </div>
   </div>
 </footer>
 
+<script>
+// duplicate ticker for seamless loop
+const tk=document.getElementById('tk');tk.innerHTML+=tk.innerHTML;
+// scroll reveal
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}})},{threshold:.12});
+document.querySelectorAll('.rev:not(.in)').forEach(el=>io.observe(el));
+</script>
 </body>
 </html>
