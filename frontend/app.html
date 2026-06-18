@@ -288,7 +288,7 @@ a,button{font-family:inherit;cursor:pointer}button{border:none;background:none;c
 
 <!-- CEO INSIGHTS -->
 <div class="page" id="page-insights">
-  <div class="ph"><div><div class="ph-title">CEO Insights</div><div class="ph-sub">// analyse stratégique générée par Claude — patterns systémiques & résumé exécutif</div></div><div class="btn-row"><button class="btn btn-primary" onclick="runPipeline()">▶&nbsp; Actualiser</button></div></div>
+  <div class="ph"><div><div class="ph-title">CEO Insights</div><div class="ph-sub">// analyse stratégique générée par l'IA — patterns systémiques & résumé exécutif</div></div><div class="btn-row"><button class="btn btn-primary" onclick="runPipeline()">▶&nbsp; Actualiser</button></div></div>
   <div id="insights-content"><div class="empty" style="padding:70px"><div class="empty-ico">🧠</div>Lancez le pipeline pour générer l'analyse CEO</div></div>
 </div>
 
@@ -300,11 +300,11 @@ a,button{font-family:inherit;cursor:pointer}button{border:none;background:none;c
 
 <!-- AGENTS -->
 <div class="page" id="page-agents">
-  <div class="ph"><div><div class="ph-title">Agents Claude</div><div class="ph-sub">// état des agents Managed Agents déployés sur platform.claude.com</div></div></div>
+  <div class="ph"><div><div class="ph-title">Agents IA</div><div class="ph-sub">// état des agents du pipeline de rétention</div></div></div>
   <div class="agent-grid">
-    <div class="agent-card"><div class="agent-ico">🧠</div><h3>CEO Strategist</h3><p>Raisonnement sur les cas limites, détection de patterns systémiques, résumé exécutif.</p><div class="agent-status"><div class="agent-dot a-ok"></div><span>Claude Sonnet 4.6 · Managed Agent</span></div></div>
-    <div class="agent-card"><div class="agent-ico">✉️</div><h3>Communication Writer</h3><p>Génération d'emails et scripts d'appel personnalisés par client selon son contexte comportemental.</p><div class="agent-status"><div class="agent-dot a-ok"></div><span>Claude Sonnet 4.6 · Managed Agent</span></div></div>
-    <div class="agent-card"><div class="agent-ico">📊</div><h3>Weekly Analyst</h3><p>Rapport hebdomadaire agrégé sur les tendances de churn, efficacité des actions et alertes fondateurs.</p><div class="agent-status"><div class="agent-dot a-ok"></div><span>Claude Sonnet 4.6 · Managed Agent</span></div></div>
+    <div class="agent-card"><div class="agent-ico">🧠</div><h3>CEO Strategist</h3><p>Raisonnement sur les cas limites, détection de patterns systémiques, résumé exécutif.</p><div class="agent-status"><div class="agent-dot a-ok"></div><span>Moteur IA · Agent géré</span></div></div>
+    <div class="agent-card"><div class="agent-ico">✉️</div><h3>Communication Writer</h3><p>Génération d'emails et scripts d'appel personnalisés par client selon son contexte comportemental.</p><div class="agent-status"><div class="agent-dot a-ok"></div><span>Moteur IA · Agent géré</span></div></div>
+    <div class="agent-card"><div class="agent-ico">📊</div><h3>Weekly Analyst</h3><p>Rapport hebdomadaire agrégé sur les tendances de churn, efficacité des actions et alertes fondateurs.</p><div class="agent-status"><div class="agent-dot a-ok"></div><span>Moteur IA · Agent géré</span></div></div>
     <div class="agent-card"><div class="agent-ico">📡</div><h3>Data Agent</h3><p>Collecte des données Stripe et logs produit. Pipeline Python pur, pas d'IA nécessaire.</p><div class="agent-status"><div class="agent-dot a-ok"></div><span>Python · Actif</span></div></div>
     <div class="agent-card"><div class="agent-ico">🔍</div><h3>Analysis + Prediction</h3><p>Détection de signaux comportementaux et scoring de churn 0→1. Règles déterministes.</p><div class="agent-status"><div class="agent-dot a-ok"></div><span>Python · Actif</span></div></div>
     <div class="agent-card"><div class="agent-ico">💰</div><h3>Finance Agent</h3><p>Calcul du ROI, revenus à risque et impact business. Calculs Python pur.</p><div class="agent-status"><div class="agent-dot a-ok"></div><span>Python · Actif</span></div></div>
@@ -332,7 +332,7 @@ a,button{font-family:inherit;cursor:pointer}button{border:none;background:none;c
 <!-- INTEGRATIONS -->
 <div class="page" id="page-integrations">
   <div class="ph"><div><div class="ph-title">Intégrations</div><div class="ph-sub">// état des connexions aux services externes</div></div></div>
-  <div class="config-section"><h2>🤖 Claude Managed Agents</h2><p>Clé API Anthropic pour les agents CEO et Communication. Configurée dans <code style="font-family:var(--fm);background:var(--surface-2);padding:2px 5px">backend/.env</code></p><div class="status-row" id="claude-status"><span>Cliquez sur Intégrations pour vérifier…</span></div></div>
+  <div class="config-section"><h2>🤖 Moteur IA</h2><p>Clé du moteur IA pour les agents CEO et Communication. Configurée dans <code style="font-family:var(--fm);background:var(--surface-2);padding:2px 5px">backend/.env</code></p><div class="status-row" id="claude-status"><span>Cliquez sur Intégrations pour vérifier…</span></div></div>
   <div class="config-section"><h2>💳 Stripe</h2><p>Collecte les données d'abonnement et crée des remises automatiques. Laissez vide pour utiliser les données de démo.</p><div class="status-row" id="stripe-status"><span class="status-no">⬤</span><span>Mode démo si STRIPE_SECRET_KEY absent</span></div></div>
   <div class="config-section"><h2>📧 SendGrid</h2><p>Envoie les emails de rétention. Sans clé, les envois sont simulés dans les logs.</p><div class="status-row" id="sendgrid-status"><span class="status-no">⬤</span><span>Mode simulation si SENDGRID_API_KEY absent</span></div></div>
   <div class="config-section"><h2>🗄️ PostgreSQL + Redis</h2><p>Base de données et cache gérés automatiquement par Docker Compose.</p><div class="status-row"><span class="status-ok">⬤</span><span style="color:var(--green)">Connecté via Docker</span></div></div>
@@ -343,7 +343,7 @@ a,button{font-family:inherit;cursor:pointer}button{border:none;background:none;c
   <div class="ph"><div><div class="ph-title">Paramètres</div><div class="ph-sub">// configuration du pipeline et des seuils de risque</div></div></div>
   <div class="config-section"><h2>🎯 Seuils de risque</h2><p>Ces seuils définissent les niveaux utilisés par le Prediction Agent.</p><div class="field"><label>Seuil Critical (score min)</label><input type="number" value="0.75" min="0" max="1" step="0.05"/></div><div class="field"><label>Seuil High (score min)</label><input type="number" value="0.55" min="0" max="1" step="0.05"/></div><div class="field"><label>Seuil Medium (score min)</label><input type="number" value="0.30" min="0" max="1" step="0.05"/></div></div>
   <div class="config-section"><h2>💰 Coût outil mensuel</h2><p>Utilisé par le Finance Agent pour calculer le ROI.</p><div class="field"><label>Coût mensuel (€)</label><input type="number" value="149" min="0"/></div></div>
-  <div class="config-section"><h2>🏷️ Nom du produit</h2><p>Affiché dans les emails générés par Claude.</p><div class="field"><label>Nom du produit</label><input type="text" value="ChurnAI"/></div></div>
+  <div class="config-section"><h2>🏷️ Nom du produit</h2><p>Affiché dans les emails générés par l'IA.</p><div class="field"><label>Nom du produit</label><input type="text" value="ChurnAI"/></div></div>
   <div style="display:flex;gap:12px"><button class="btn btn-ghost">Réinitialiser</button><button class="btn btn-primary" onclick="toast('Paramètres sauvegardés — redémarrez le backend pour appliquer',true)">Sauvegarder</button></div>
 </div>
 
@@ -425,7 +425,7 @@ function renderRisk(list){
 
 function actionHtml(actions){
   if(!actions.length) return '<div class="empty"><div class="empty-ico">🎯</div>Aucune action exécutée</div>';
-  return actions.map(a=>'<div class="ai"><div class="ai-ico '+(AICLS[a.action_type]||'ico-e')+'">'+( AICO[a.action_type]||'📧')+'</div><div class="ai-body"><div class="ai-cid">'+a.customer_id+(a.claude_personalized?' <span class="ft" style="color:var(--accent)">Claude ✓</span>':'')+'</div><div class="ai-desc">'+(a.detail||a.action_type)+'</div><div class="ai-save">+'+fmt.eur(a.revenue_saved||0)+' estimés</div></div><div class="ai-ok '+(a.success?'ok':'err')+'">'+(a.success?'✓':'✗')+'</div></div>').join('');
+  return actions.map(a=>'<div class="ai"><div class="ai-ico '+(AICLS[a.action_type]||'ico-e')+'">'+( AICO[a.action_type]||'📧')+'</div><div class="ai-body"><div class="ai-cid">'+a.customer_id+(a.claude_personalized?' <span class="ft" style="color:var(--accent)">IA ✓</span>':'')+'</div><div class="ai-desc">'+(a.detail||a.action_type)+'</div><div class="ai-save">+'+fmt.eur(a.revenue_saved||0)+' estimés</div></div><div class="ai-ok '+(a.success?'ok':'err')+'">'+(a.success?'✓':'✗')+'</div></div>').join('');
 }
 
 function renderActions(actions){
@@ -435,7 +435,7 @@ function renderActions(actions){
 }
 
 function renderInsights(ceo){
-  if(!ceo||!ceo.health_score){ $('insights-content').innerHTML='<div class="empty" style="padding:70px"><div class="empty-ico">🧠</div>Aucune insight CEO — vérifiez ANTHROPIC_API_KEY dans .env</div>'; return; }
+  if(!ceo||!ceo.health_score){ $('insights-content').innerHTML='<div class="empty" style="padding:70px"><div class="empty-ico">🧠</div>Aucune insight CEO — vérifiez la clé du moteur IA dans .env</div>'; return; }
   const hColor=ceo.health_score>=70?'var(--green)':ceo.health_score>=40?'var(--amber)':'var(--red)';
   const patterns=(ceo.systemic_patterns||[]).map(p=>'<div class="pattern-item"><div class="pattern-top"><span class="pattern-name">'+(p.pattern_name||'—')+'</span><span class="badge '+(badgeCls[p.severity]||'bl')+'">'+p.severity+'</span></div><div class="pattern-desc">'+(p.description||'')+'</div><div class="pattern-action">→ '+(p.recommended_product_action||'')+'</div></div>').join('')||'<div class="empty" style="padding:20px"><div class="empty-ico">✅</div>Aucun pattern systémique</div>';
   const risks=(ceo.top_risks||[]).map(r=>'<div style="padding:11px 0;border-bottom:1px solid var(--border);font-size:14px">⚠ '+r+'</div>').join('');
@@ -458,7 +458,7 @@ function populatePage(page,data){
 async function checkIntegrations(){
   try{
     await fetch(API+'/health');
-    $('claude-status').innerHTML='<span class="status-ok">⬤</span><span style="color:var(--green)">Backend opérationnel · Vérifiez ANTHROPIC_API_KEY dans .env</span>';
+    $('claude-status').innerHTML='<span class="status-ok">⬤</span><span style="color:var(--green)">Backend opérationnel · Vérifiez la clé du moteur IA dans .env</span>';
   }catch{
     $('claude-status').innerHTML='<span style="color:var(--red)">⬤</span><span style="color:var(--red)">Backend inaccessible — Docker démarré ?</span>';
   }
@@ -471,7 +471,7 @@ async function runPipeline(){
     const[data]=await Promise.all([fetch(API+'/dashboard').then(r=>r.json()),anim]);
     lastData=data;
     renderKPIs(data.kpis); renderBd(data.breakdown_by_risk); renderRisk(data.churn_risk_list||[]); renderActions(data.recent_actions||[]); renderInsights(data.ceo_insights||{}); renderTopSaves(data.top_saves||[]);
-    setTime(); $('agent-status-txt').textContent='Claude '+(data.claude_agents_used?'actif':'⚠ non configuré');
+    setTime(); $('agent-status-txt').textContent='IA '+(data.claude_agents_used?'active':'⚠ non configurée');
     toast('Pipeline terminé en '+data.pipeline_duration+'s');
     if(currentPage!=='dashboard') populatePage(currentPage,data);
   }catch(e){ await anim; loadDemo(); toast('Mode démo — API hors ligne',false); }
