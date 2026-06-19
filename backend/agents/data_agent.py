@@ -7,10 +7,10 @@ v2: removed dead crewai/langchain/openai imports (were never called in collect()
 """
 
 import os
-import httpx
 from datetime import datetime, timedelta
 from typing import Any
 
+import httpx
 
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 
@@ -81,7 +81,8 @@ async def collect(user_ids: list[str] | None = None) -> dict[str, Any]:
 
 
 def _build_usage_summary(subscriptions: list[dict]) -> list[dict]:
-    import random, hashlib
+    import hashlib
+    import random
     summaries = []
     for sub in subscriptions:
         cid  = sub["customer"]

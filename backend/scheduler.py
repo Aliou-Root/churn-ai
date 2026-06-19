@@ -11,10 +11,10 @@ Pour ajouter une tâche :
     scheduler.add_job(ma_fonction, trigger=CronTrigger(...), id='mon_job')
 """
 
+import asyncio
 import json
 import logging
-import asyncio
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -35,10 +35,11 @@ async def run_weekly_report() -> None:
     4. Log le résultat (TODO: envoyer par email/Slack en production).
     """
     # Import ici pour éviter les circular imports au démarrage
-    from db.database import AsyncSessionLocal
-    from db.models import ChurnScore, ActionLog, RiskLevelEnum
     from sqlalchemy import select
+
     from agents.ceo_agent import WEEKLY_ANALYST_SYSTEM_PROMPT, _call_claude_sync, _parse_json
+    from db.database import AsyncSessionLocal
+    from db.models import ActionLog, ChurnScore
 
     logger.info("Weekly Analyst job started")
     week_end   = datetime.now(timezone.utc)

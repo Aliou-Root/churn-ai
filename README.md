@@ -121,7 +121,25 @@ Toutes les routes sont préfixées par `/api/v1`. Si `API_KEY` est défini, ajou
 | `GET`  | `/dashboard` | Données complètes du dashboard (cache Redis 30 min) |
 | `POST` | `/dashboard/refresh` | Force le recalcul sans cache |
 | `GET`  | `/insights` | Insights CEO seuls (léger) |
+| `GET`  | `/history` | Séries temporelles des runs (pour les graphiques de tendance) |
+| `GET` · `PUT` | `/config` | Lire / modifier les paramètres runtime (seuils, coût outil, nom produit) |
+| `POST` | `/actions/{id}/outcome` | Boucle de feedback : le client a-t-il été retenu ? |
+| `POST` | `/webhooks/stripe` | Webhook Stripe (signature HMAC vérifiée) |
 | `GET`  | `/users/{customer_id}/risk` | Profil de risque d'un client |
+
+> **Rate limiting** : les endpoints qui déclenchent le pipeline sont limités (10–20 req/min par IP via SlowAPI). **Sécurité** : en `APP_ENV=production`, l'app refuse de démarrer sans `API_KEY` ni `CORS_ORIGINS` explicite.
+
+### Modèle de churn
+
+Le `prediction_agent` utilise un modèle **scikit-learn** (régression logistique) entraîné sur un jeu synthétique reproductible, avec repli automatique sur l'heuristique déterministe si scikit-learn est absent. Voir [`agents/model.py`](backend/agents/model.py).
+
+### Migrations
+
+Schéma géré par **Alembic** (`cd backend && alembic upgrade head`). Une révision baseline crée toutes les tables ; les évolutions suivantes se génèrent avec `alembic revision --autogenerate`.
+
+### Tests & CI
+
+`cd backend && pytest` (suite unitaire + intégration du pipeline en mode démo). La CI GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) exécute `ruff` + `pytest` à chaque push/PR.
 
 Exemple :
 

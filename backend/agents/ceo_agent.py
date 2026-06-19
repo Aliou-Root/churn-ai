@@ -8,17 +8,16 @@ Améliorations v4 :
   - Graceful degradation complète si Claude non configuré
 """
 
-import os
-import json
 import asyncio
+import json
 import logging
+import os
 from datetime import datetime
 from typing import Any
 
 import anthropic
 
-from agents import data_agent, analysis_agent, prediction_agent
-from agents import decision_agent, action_agent, finance_agent
+from agents import action_agent, analysis_agent, data_agent, decision_agent, finance_agent, prediction_agent
 
 logger = logging.getLogger(__name__)
 
@@ -212,8 +211,10 @@ def _build_comms_payload(decision: dict, prediction: dict,
     cid    = decision["customer_id"]
 
     plan_name = "starter"
-    if mrr >= 249: plan_name = "business"
-    elif mrr >= 99: plan_name = "pro"
+    if mrr >= 249:
+        plan_name = "business"
+    elif mrr >= 99:
+        plan_name = "pro"
 
     lookup      = (customer_lookup or {}).get(cid, {})
     name        = lookup.get("name", cid)

@@ -4,17 +4,21 @@ Multi-agent AI system powered by Claude Managed Agents + FastAPI
 v4: scheduler APScheduler, logging structuré, validation env au démarrage
 """
 
-import os
 import logging
+import os
 import sys
 from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
-from db.database import create_tables
 from api.routes import router
+from db.database import create_tables
+from ratelimit import limiter
+from webhooks import router as webhooks_router
 
 # ─── Logging ──────────────────────────────────────────────────────────────────
 
@@ -37,7 +41,7 @@ def _check_env() -> None:
     """
     required = ["DATABASE_URL"]
     optional_warnings = {
-        "ANTHROPIC_API_KEY": "Claude agents désactivés — pipeline fonctionne sans raisonnement IA",
+        "ANTHROPIC_API_KEY": "moteur IA désactivé — pipeline fonctionne sans raisonnement IA",
         "STRIPE_SECRET_KEY": "Stripe non configuré — utilisation des données mock",
         "SENDGRID_API_KEY":  "SendGrid non configuré — emails simulés dans les logs",
         "API_KEY":           "Authentification désactivée — API ouverte (dev mode)",
@@ -47,6 +51,15 @@ def _check_env() -> None:
         if not os.getenv(var):
             logger.error("Variable d'environnement REQUISE manquante : %s", var)
             sys.exit(1)
+
+    # In production, refuse to start an unauthenticated, wide-open API.
+    is_prod = os.getenv("APP_ENV", "development").lower() == "production"
+    if is_prod and not os.getenv("API_KEY"):
+        logger.error("APP_ENV=production mais API_KEY absent — refus de démarrer une API ouverte")
+        sys.exit(1)
+    if is_prod and os.getenv("CORS_ORIGINS", "*") == "*":
+        logger.error("APP_ENV=production mais CORS_ORIGINS='*' — définissez les origines autorisées")
+        sys.exit(1)
 
     for var, msg in optional_warnings.items():
         if not os.getenv(var):
@@ -66,6 +79,14 @@ async def lifespan(app: FastAPI):
     # Tables PostgreSQL
     await create_tables()
     logger.info("✅ Tables PostgreSQL prêtes")
+
+    # Config runtime (seuils, coût outil, nom produit) depuis Redis
+    try:
+        import config
+        from api.routes import get_redis
+        await config.load(await get_redis())
+    except Exception as exc:
+        logger.warning("Config non chargée depuis Redis (défauts utilisés): %s", exc)
 
     # Scheduler APScheduler
     from scheduler import init_scheduler
@@ -91,15 +112,24 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+# Rate limiting (SlowAPI)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# CORS — configurable. Defaults to open in dev; must be locked down in prod
+# (enforced by _check_env). Example: CORS_ORIGINS="https://app.example.com,https://example.com"
+_origins_env = os.getenv("CORS_ORIGINS", "*").strip()
+_allow_origins = ["*"] if _origins_env in ("", "*") else [o.strip() for o in _origins_env.split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # TODO: restreindre en production
-    allow_credentials=True,
+    allow_origins=_allow_origins,
+    allow_credentials=_allow_origins != ["*"],  # credentials + wildcard is invalid
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 app.include_router(router, prefix="/api/v1")
+app.include_router(webhooks_router, prefix="/api/v1")
 
 
 @app.get("/")

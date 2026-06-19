@@ -9,10 +9,10 @@ Fallback automatique vers les templates v1 si Claude n'est pas configuré.
 """
 
 import os
-import httpx
 from datetime import datetime
 from typing import Any
 
+import httpx
 
 SENDGRID_API_KEY  = os.getenv("SENDGRID_API_KEY", "")
 FROM_EMAIL        = os.getenv("FROM_EMAIL", "noreply@churnai.io")

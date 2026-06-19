@@ -5,15 +5,13 @@ v2: ActionTypeEnum étendu avec no_action et flag_for_review
     (valeurs retournées par le CEO Agent Claude).
 """
 
-from sqlalchemy import (
-    Column, String, Float, Integer, Boolean,
-    DateTime, Text, ForeignKey, JSON, Enum
-)
+import enum
+import uuid
+
+from sqlalchemy import JSON, Boolean, Column, DateTime, Enum, Float, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-import uuid
-import enum
 
 from db.database import Base
 
@@ -103,6 +101,28 @@ class ActionLog(Base):
     revenue_saved = Column(Float, default=0.0)
     # v2 — CEO Agent metadata
     ceo_override  = Column(Boolean, default=False)   # action modifiée par CEO Agent
-    claude_personalized = Column(Boolean, default=False)  # email généré par Claude
+    claude_personalized = Column(Boolean, default=False)  # email généré par l'IA
+    # v5 — feedback loop: did the action actually prevent churn?
+    retained            = Column(Boolean)                 # None = pending, True/False = recorded
+    actual_revenue_saved = Column(Float)                  # measured, vs. estimated revenue_saved
+    outcome_recorded_at = Column(DateTime(timezone=True))
 
     user = relationship("User", back_populates="action_logs")
+
+
+# ─── Pipeline Run (time-series snapshots) ──────────────────────────────────────
+
+class PipelineRun(Base):
+    __tablename__ = "pipeline_runs"
+
+    id                = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    created_at        = Column(DateTime(timezone=True), server_default=func.now(), index=True)
+    users_at_risk     = Column(Integer, default=0)
+    revenue_at_risk   = Column(Float, default=0.0)
+    revenue_saved     = Column(Float, default=0.0)
+    roi_ratio         = Column(Float, default=0.0)
+    avg_churn_score   = Column(Float, default=0.0)
+    success_rate      = Column(Float, default=0.0)
+    actions_executed  = Column(Integer, default=0)
+    duration_seconds  = Column(Float, default=0.0)
+    ai_used           = Column(Boolean, default=False)

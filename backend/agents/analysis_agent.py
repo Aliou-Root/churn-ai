@@ -4,9 +4,8 @@ AnalysisAgent — detects churn patterns from collected data.
 Output: risk signals per user (login decline, feature abandonment, etc.)
 """
 
-from typing import Any
 from datetime import datetime
-
+from typing import Any
 
 # Risk signal weights
 WEIGHTS = {

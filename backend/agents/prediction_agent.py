@@ -5,10 +5,13 @@ score (0 → 1) and risk category, using an ML-style heuristic model.
 In production: swap _predict_score() with a trained scikit-learn / XGBoost model.
 """
 
-from typing import Any
 from datetime import datetime, timedelta
+from typing import Any
 
+import config
+from agents import model
 
+# Fallback thresholds — overridden at runtime by the values in config.current().
 RISK_THRESHOLDS = {
     "low":      (0.00, 0.30),
     "medium":   (0.30, 0.55),
@@ -66,29 +69,42 @@ def predict(analysis_results: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 def _predict_score(result: dict) -> float:
     """
-    Blend signal_score with usage depth metrics.
-    In production: call model.predict_proba([feature_vector])[0][1]
-    """
-    base     = result["signal_score"]
-    usage    = result.get("usage_profile", {})
+    Churn probability in [0,1].
 
-    # Boost score if very inactive
+    Uses the trained scikit-learn model when available; otherwise blends the
+    weighted signal score with usage-depth heuristics (deterministic fallback).
+    """
+    usage = result.get("usage_profile", {})
+    cancel_intent = result.get("subscription", {}).get("cancel_at_period_end", False)
+
+    ml = model.predict_proba(usage, cancel_intent)
+    if ml is not None:
+        # Blend the model with the rules so a hard cancel-intent signal is never
+        # under-weighted by the smooth model output.
+        base = result["signal_score"]
+        score = 0.7 * ml + 0.3 * base
+        return max(0.0, min(1.0, score))
+
+    # ── Heuristic fallback (no scikit-learn) ──────────────────────────────────
+    base = result["signal_score"]
     inactivity_days = usage.get("last_login_days_ago", 0)
     inactivity_boost = min(inactivity_days / 60, 0.20)
-
-    # Reduce score if features are actively used
     features_used = usage.get("features_used", 0)
     engagement_penalty = min(features_used / 30, 0.10)
-
     score = base + inactivity_boost - engagement_penalty
     return max(0.0, min(1.0, score))
 
 
 def _classify_risk(score: float) -> str:
-    for level, (lo, hi) in RISK_THRESHOLDS.items():
-        if lo <= score < hi:
-            return level
-    return "critical"
+    """Classify using the runtime-configurable thresholds."""
+    cfg = config.current()
+    if score >= cfg["threshold_critical"]:
+        return "critical"
+    if score >= cfg["threshold_high"]:
+        return "high"
+    if score >= cfg["threshold_medium"]:
+        return "medium"
+    return "low"
 
 
 def _extract_mrr(result: dict) -> float:

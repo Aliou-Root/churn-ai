@@ -8,12 +8,20 @@ Fournit :
 """
 
 import logging
+import uuid as uuidlib
 from datetime import datetime, timezone
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
 
-from db.database import Base
-from db.models import User, ChurnScore, ActionLog, ActionTypeEnum, RiskLevelEnum
+from sqlalchemy import desc, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from db.models import (
+    ActionLog,
+    ActionTypeEnum,
+    ChurnScore,
+    PipelineRun,
+    RiskLevelEnum,
+    User,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -144,6 +152,68 @@ async def save_pipeline_results(
         await session.rollback()
 
     return saved
+
+
+# ─── Pipeline run snapshots (time-series) ──────────────────────────────────────
+
+async def save_pipeline_run(session: AsyncSession, roi: dict, duration_seconds: float,
+                            ai_used: bool) -> None:
+    """Store one aggregated snapshot of a pipeline run for trend charts."""
+    try:
+        session.add(PipelineRun(
+            users_at_risk    = roi.get("users_at_risk", 0),
+            revenue_at_risk  = roi.get("total_revenue_at_risk", 0.0),
+            revenue_saved    = roi.get("total_revenue_saved", 0.0),
+            roi_ratio        = roi.get("roi_ratio", 0.0),
+            avg_churn_score  = roi.get("avg_churn_score", 0.0),
+            success_rate     = roi.get("success_rate", 0.0),
+            actions_executed = roi.get("actions_executed", 0),
+            duration_seconds = duration_seconds,
+            ai_used          = ai_used,
+        ))
+        await session.commit()
+    except Exception as exc:
+        logger.warning("Failed to save pipeline run snapshot: %s", exc)
+        await session.rollback()
+
+
+async def get_pipeline_history(session: AsyncSession, limit: int = 30) -> list[dict]:
+    """Return the most recent runs (oldest→newest) for charting."""
+    result = await session.execute(
+        select(PipelineRun).order_by(desc(PipelineRun.created_at)).limit(limit)
+    )
+    runs = list(result.scalars().all())
+    runs.reverse()
+    return [{
+        "created_at":       r.created_at.isoformat() if r.created_at else None,
+        "users_at_risk":    r.users_at_risk,
+        "revenue_at_risk":  r.revenue_at_risk,
+        "revenue_saved":    r.revenue_saved,
+        "roi_ratio":        r.roi_ratio,
+        "avg_churn_score":  r.avg_churn_score,
+        "success_rate":     r.success_rate,
+    } for r in runs]
+
+
+# ─── Feedback loop: record real outcome of an action ────────────────────────────
+
+async def record_action_outcome(session: AsyncSession, action_id: str,
+                                 retained: bool, actual_revenue_saved: float | None) -> bool:
+    """Mark whether a logged retention action actually prevented churn."""
+    try:
+        aid = uuidlib.UUID(str(action_id))
+    except (ValueError, AttributeError):
+        return False
+    result = await session.execute(select(ActionLog).where(ActionLog.id == aid))
+    log = result.scalar_one_or_none()
+    if not log:
+        return False
+    log.retained = retained
+    if actual_revenue_saved is not None:
+        log.actual_revenue_saved = actual_revenue_saved
+    log.outcome_recorded_at = datetime.now(timezone.utc)
+    await session.commit()
+    return True
 
 
 # ─── Customer lookup ───────────────────────────────────────────────────────────

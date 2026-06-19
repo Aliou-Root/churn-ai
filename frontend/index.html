@@ -7,6 +7,10 @@
 <meta name="description" content="ChurnAI lit les signaux faibles de vos clients SaaS, prédit qui s'apprête à partir et déclenche la bonne action de rétention. Un système multi-agents propulsé par l'IA."/>
 <meta property="og:title" content="ChurnAI — Intelligence de rétention SaaS"/>
 <meta property="og:description" content="Du signal brut à l'action, en autonomie. Six agents. Un objectif : la rétention."/>
+<meta property="og:image" content="og.svg"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="theme-color" content="#1d1ae6"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f2eee4'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%231d1ae6'/%3E%3C/svg%3E"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,600&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
@@ -177,6 +181,9 @@ footer{background:var(--ink);color:var(--paper);padding:64px 0 40px}
   .foot-top{grid-template-columns:1fr 1fr}
 }
 @media(max-width:540px){.deck{grid-template-columns:1fr}.roi-grid{grid-template-columns:1fr}.roi-cell{border-left:none;border-top:1px solid rgba(255,255,255,.28)}.nav-r .gh{display:none}}
+/* accessibility: respect reduced-motion + visible focus */
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}.rev{opacity:1!important;transform:none!important}.ticker-track{animation:none!important}}
+a:focus-visible,.btn:focus-visible{outline:3px solid var(--klein);outline-offset:3px}
 </style>
 </head>
 <body>

@@ -12,24 +12,32 @@ Améliorations v4 :
 
 import json
 import logging
+import os
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
-from pydantic import BaseModel
 import redis.asyncio as aioredis
+from fastapi import APIRouter, Depends, HTTPException, Request
+from pydantic import BaseModel
 
-from auth import verify_api_key
+import config
+from agents import analysis_agent, data_agent, decision_agent, prediction_agent
 from agents.ceo_agent import run_full_pipeline
-from agents import data_agent, analysis_agent, prediction_agent, decision_agent
-from db.database import get_db, AsyncSessionLocal
-from db.db_helpers import save_pipeline_results, get_customer_lookup
+from auth import verify_api_key
+from db.database import AsyncSessionLocal
+from db.db_helpers import (
+    get_customer_lookup,
+    get_pipeline_history,
+    record_action_outcome,
+    save_pipeline_results,
+    save_pipeline_run,
+)
+from ratelimit import limiter
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # ─── Redis cache ──────────────────────────────────────────────────────────────
 
-import os
 REDIS_URL       = os.getenv("REDIS_URL", "redis://redis:6379/0")
 CACHE_KEY       = "churnai:dashboard:latest"
 CACHE_TTL       = 1800  # 30 minutes
@@ -149,6 +157,12 @@ async def _run_and_persist(user_ids: list[str] | None = None) -> dict:
                 decisions=result["decisions"],
                 action_results=result["action_results"],
             )
+            await save_pipeline_run(
+                session,
+                roi=result["roi"],
+                duration_seconds=result.get("duration_seconds", 0.0),
+                ai_used=result.get("claude_agents_used", False),
+            )
         except Exception as exc:
             logger.error("Persistance DB échouée (pipeline continue): %s", exc)
 
@@ -192,7 +206,8 @@ async def health():
 
 
 @router.post("/analyze", dependencies=[Depends(verify_api_key)])
-async def analyze(req: AnalyzeRequest) -> dict[str, Any]:
+@limiter.limit("20/minute")
+async def analyze(request: Request, req: AnalyzeRequest) -> dict[str, Any]:
     """Stage 1+2 : collecte + analyse comportementale."""
     dataset  = await data_agent.collect(user_ids=req.user_ids)
     analysis = analysis_agent.run(dataset)
@@ -200,7 +215,8 @@ async def analyze(req: AnalyzeRequest) -> dict[str, Any]:
 
 
 @router.post("/predict", dependencies=[Depends(verify_api_key)])
-async def predict(req: PredictRequest) -> dict[str, Any]:
+@limiter.limit("20/minute")
+async def predict(request: Request, req: PredictRequest) -> dict[str, Any]:
     """Stage 1+2+3 : collecte + analyse + prédictions churn."""
     dataset     = await data_agent.collect(user_ids=req.user_ids)
     analysis    = analysis_agent.run(dataset)
@@ -209,7 +225,8 @@ async def predict(req: PredictRequest) -> dict[str, Any]:
 
 
 @router.post("/act", dependencies=[Depends(verify_api_key)])
-async def act(req: ActRequest) -> dict[str, Any]:
+@limiter.limit("10/minute")
+async def act(request: Request, req: ActRequest) -> dict[str, Any]:
     """
     Pipeline complet.
     dry_run=True : simule sans exécuter et sans appeler Claude.
@@ -231,7 +248,8 @@ async def act(req: ActRequest) -> dict[str, Any]:
 
 
 @router.post("/pipeline/run", dependencies=[Depends(verify_api_key)])
-async def pipeline_run(req: PipelineRunRequest) -> dict[str, Any]:
+@limiter.limit("10/minute")
+async def pipeline_run(request: Request, req: PipelineRunRequest) -> dict[str, Any]:
     """
     Déclencheur explicite du pipeline.
     Utilisé par le bouton "Lancer les agents" du dashboard.
@@ -263,7 +281,8 @@ async def dashboard() -> dict[str, Any]:
 
 
 @router.post("/dashboard/refresh", dependencies=[Depends(verify_api_key)])
-async def dashboard_refresh() -> dict[str, Any]:
+@limiter.limit("10/minute")
+async def dashboard_refresh(request: Request) -> dict[str, Any]:
     """Force le recalcul du dashboard en ignorant le cache."""
     await invalidate_cache()
     result = await _run_and_persist()
@@ -284,6 +303,59 @@ async def insights() -> dict[str, Any]:
         status_code=404,
         detail="Aucune donnée disponible. Lancez le pipeline d'abord via POST /pipeline/run"
     )
+
+
+@router.get("/history", dependencies=[Depends(verify_api_key)])
+async def history(limit: int = 30) -> dict[str, Any]:
+    """Historique des runs (séries temporelles) pour les graphiques de tendance."""
+    limit = max(1, min(limit, 90))
+    async with AsyncSessionLocal() as session:
+        runs = await get_pipeline_history(session, limit=limit)
+    return {"count": len(runs), "runs": runs}
+
+
+# ─── Runtime configuration ──────────────────────────────────────────────────
+
+class ConfigUpdate(BaseModel):
+    threshold_critical: float | None = None
+    threshold_high:     float | None = None
+    threshold_medium:   float | None = None
+    tool_cost:          float | None = None
+    product_name:       str | None = None
+
+
+@router.get("/config", dependencies=[Depends(verify_api_key)])
+async def get_config() -> dict[str, Any]:
+    """Paramètres runtime actuels (seuils, coût outil, nom produit)."""
+    return config.current()
+
+
+@router.put("/config", dependencies=[Depends(verify_api_key)])
+async def put_config(patch: ConfigUpdate) -> dict[str, Any]:
+    """Met à jour les paramètres runtime et les persiste (Redis)."""
+    r = await get_redis()
+    updated = await config.update(r, patch.model_dump(exclude_none=True))
+    await invalidate_cache()  # thresholds/cost affect the next pipeline output
+    return updated
+
+
+# ─── Feedback loop ────────────────────────────────────────────────────────────
+
+class OutcomeRequest(BaseModel):
+    retained: bool
+    actual_revenue_saved: float | None = None
+
+
+@router.post("/actions/{action_id}/outcome", dependencies=[Depends(verify_api_key)])
+async def action_outcome(action_id: str, req: OutcomeRequest) -> dict[str, Any]:
+    """Enregistre si une action de rétention a réellement évité le churn."""
+    async with AsyncSessionLocal() as session:
+        ok = await record_action_outcome(
+            session, action_id, req.retained, req.actual_revenue_saved
+        )
+    if not ok:
+        raise HTTPException(status_code=404, detail="Action introuvable")
+    return {"action_id": action_id, "retained": req.retained, "recorded": True}
 
 
 @router.get("/users/{customer_id}/risk", dependencies=[Depends(verify_api_key)])

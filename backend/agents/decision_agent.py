@@ -6,7 +6,6 @@ Rules engine (extendable to LLM-based decision making).
 
 from typing import Any
 
-
 ACTION_RULES: list[dict] = [
     # (condition_fn, action_type, priority, description)
     {

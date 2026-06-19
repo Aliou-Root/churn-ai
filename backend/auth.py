@@ -9,9 +9,10 @@ Usage dans routes.py :
     @router.get("/endpoint", dependencies=[Depends(verify_api_key)])
 """
 
-import os
 import logging
-from fastapi import Security, HTTPException, status, Depends
+import os
+
+from fastapi import HTTPException, Security, status
 from fastapi.security import APIKeyHeader
 
 logger = logging.getLogger(__name__)

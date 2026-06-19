@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f2eee4"/>
+  <g fill="none" stroke="#d9d2c1" stroke-width="1">
+    <path d="M0 158 H1200 M0 472 H1200 M400 0 V630 M800 0 V630"/>
+  </g>
+  <circle cx="92" cy="92" r="13" fill="#1d1ae6"/>
+  <circle cx="92" cy="92" r="22" fill="none" stroke="#1d1ae6" stroke-opacity="0.25" stroke-width="8"/>
+  <text x="128" y="104" font-family="Georgia,serif" font-size="34" font-weight="700" fill="#14120c">ChurnAI</text>
+  <text x="80" y="330" font-family="Georgia,serif" font-size="104" font-weight="700" fill="#14120c">Le départ se</text>
+  <text x="80" y="446" font-family="Georgia,serif" font-size="104" font-style="italic" font-weight="700" fill="#1d1ae6">voit venir.</text>
+  <text x="80" y="552" font-family="'Courier New',monospace" font-size="22" letter-spacing="3" fill="#665f51">INTELLIGENCE DE RÉTENTION SAAS · MULTI-AGENTS</text>
+</svg>

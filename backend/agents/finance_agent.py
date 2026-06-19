@@ -2,8 +2,8 @@
 FinanceAgent — calculates ROI, revenue saved, and business impact metrics.
 """
 
-from typing import Any
 from datetime import datetime
+from typing import Any
 
 
 def calculate_roi(
@@ -41,8 +41,9 @@ def calculate_roi(
     breakdown = _breakdown_by_risk(predictions)
     top_saves = _top_saves(action_results, predictions)
 
-    # Assume tool costs 149€/month for this example
-    tool_cost = 149.0
+    # Monthly tool cost is runtime-configurable from the Settings page.
+    import config
+    tool_cost = config.get("tool_cost") or 149.0
     roi_ratio = round(total_saved / tool_cost, 2) if tool_cost > 0 else 0
 
     return {
