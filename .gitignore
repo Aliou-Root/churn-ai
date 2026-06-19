@@ -5,6 +5,9 @@
 *.pem
 *.key
 
+# ─── Private internal docs (not for public repo) ─────────────────────────────
+docs/AGENT_BRIEF.md
+
 # ─── Python ─────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
